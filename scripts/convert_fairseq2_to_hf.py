@@ -15,11 +15,13 @@ Usage:
     python scripts/convert_fairseq2_to_hf.py \
         --input_checkpoint path/to/fairseq2/checkpoint.pt \
         --output_dir path/to/output/dir \
-        --model_config 7b
+        --model_config 300m \
+        --tokenizer_path path/to/tokenizer.model
 
 The output directory will contain:
     - pytorch_model.bin: Converted model weights
-    - config.json: Model configuration (if applicable)
+    - conversion_metadata.json: Conversion information
+    - tokenizer.model: Tokenizer file (if --tokenizer_path provided)
 """
 
 import argparse
@@ -123,6 +125,7 @@ def convert_checkpoint(
     input_path: Path,
     output_dir: Path,
     model_config: str = "7b",
+    tokenizer_path: Path | None = None,
 ) -> None:
     """Convert a complete fairseq2 checkpoint to HuggingFace format.
 
@@ -130,6 +133,7 @@ def convert_checkpoint(
         input_path: Path to fairseq2 checkpoint (.pt file)
         output_dir: Directory to save converted checkpoint
         model_config: Model configuration name (e.g., "7b", "300m")
+        tokenizer_path: Optional path to tokenizer file to copy (.model for SentencePiece)
     """
     print(f"Loading fairseq2 checkpoint from {input_path}")
     checkpoint = torch.load(input_path, map_location="cpu")
@@ -201,10 +205,24 @@ def convert_checkpoint(
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
-    print("Conversion complete!")
+    # Copy tokenizer file if provided
+    if tokenizer_path and tokenizer_path.exists():
+        import shutil
+        tokenizer_output = output_dir / tokenizer_path.name
+        print(f"\nCopying tokenizer file to {tokenizer_output}")
+        shutil.copy(tokenizer_path, tokenizer_output)
+        print("✓ Tokenizer copied")
+    else:
+        print("\nWarning: No tokenizer file provided.")
+        print("You will need to provide a tokenizer separately for inference.")
+        print("Use --tokenizer_path to copy the tokenizer file during conversion.")
+
+    print("\nConversion complete!")
     print(f"\nOutput files:")
     print(f"  - Model weights: {output_path}")
     print(f"  - Metadata: {metadata_path}")
+    if tokenizer_path and tokenizer_path.exists():
+        print(f"  - Tokenizer: {output_dir / tokenizer_path.name}")
     print(f"\nTo load the converted model:")
     print(f"  state_dict = torch.load('{output_path}')")
 
@@ -231,6 +249,12 @@ def main():
         default="7b",
         help="Model configuration name (e.g., 7b, 300m, 1b, 3b)",
     )
+    parser.add_argument(
+        "--tokenizer_path",
+        type=Path,
+        default=None,
+        help="Optional path to tokenizer file (.model for SentencePiece) to copy to output directory",
+    )
 
     args = parser.parse_args()
 
@@ -243,6 +267,7 @@ def main():
         input_path=args.input_checkpoint,
         output_dir=args.output_dir,
         model_config=args.model_config,
+        tokenizer_path=args.tokenizer_path,
     )
 
 

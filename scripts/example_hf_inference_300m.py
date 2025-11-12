@@ -45,38 +45,7 @@ from omnilingual_asr.models.wav2vec2_llama.config import (
     Wav2Vec2LlamaBeamSearchConfig,
 )
 from omnilingual_asr.models.inference.pipeline_hf import ASRInferencePipelineHF
-
-
-class SimpleTokenizer:
-    """Simple wrapper for tokenizer to provide encode/decode interface."""
-
-    def __init__(self, tokenizer_path: str = None):
-        """Initialize tokenizer. For now, uses a simple character-level tokenizer."""
-        # In production, you would load a real tokenizer here
-        # e.g., from sentencepiece or transformers
-        self.pad_idx = 1
-        self.bos_idx = 0
-        self.eos_idx = 2
-        self.unk_idx = 3
-
-        print(f"Warning: Using simple placeholder tokenizer. "
-              f"Replace with actual tokenizer from {tokenizer_path}")
-
-    def encode(self, text: str) -> List[int]:
-        """Encode text to token IDs."""
-        # Placeholder - replace with real tokenizer
-        return [self.bos_idx] + [ord(c) % 256 for c in text] + [self.eos_idx]
-
-    def decode(self, token_ids: List[int], skip_special_tokens: bool = True) -> str:
-        """Decode token IDs to text."""
-        # Placeholder - replace with real tokenizer
-        if skip_special_tokens:
-            token_ids = [t for t in token_ids
-                        if t not in [self.pad_idx, self.bos_idx, self.eos_idx, self.unk_idx]]
-        try:
-            return ''.join(chr(t) if t < 256 else '?' for t in token_ids)
-        except:
-            return ""
+from omnilingual_asr.models.inference.tokenizer import load_tokenizer
 
 
 def load_300m_model(
@@ -223,8 +192,15 @@ def main():
     parser.add_argument(
         "--tokenizer_path",
         type=str,
-        default=None,
-        help="Path to tokenizer (optional, uses placeholder if not provided)",
+        required=True,
+        help="Path to tokenizer model file (.model for SentencePiece)",
+    )
+    parser.add_argument(
+        "--tokenizer_type",
+        type=str,
+        default="sentencepiece",
+        choices=["sentencepiece", "huggingface"],
+        help="Type of tokenizer (default: sentencepiece)",
     )
     parser.add_argument(
         "--audio_files",
@@ -290,8 +266,30 @@ def main():
     print("\n" + "="*60)
     print("STEP 2: Loading Tokenizer")
     print("="*60)
-    tokenizer = SimpleTokenizer(args.tokenizer_path)
-    print("✓ Tokenizer initialized")
+
+    try:
+        tokenizer = load_tokenizer(
+            tokenizer_path=args.tokenizer_path,
+            tokenizer_type=args.tokenizer_type,
+            bos_idx=0,
+            eos_idx=2,
+            pad_idx=1,
+            unk_idx=3,
+        )
+        print("✓ Tokenizer loaded successfully")
+    except FileNotFoundError:
+        print(f"Error: Tokenizer file not found at {args.tokenizer_path}")
+        print("\nMake sure you have the tokenizer file (.model for SentencePiece)")
+        print("It should be available alongside your model checkpoint.")
+        return
+    except ImportError as e:
+        print(f"Error: {e}")
+        print("\nMake sure you have installed the required tokenizer library:")
+        if args.tokenizer_type == "sentencepiece":
+            print("  pip install sentencepiece")
+        else:
+            print("  pip install transformers")
+        return
 
     # Configure beam search
     beam_config = Wav2Vec2LlamaBeamSearchConfig(
