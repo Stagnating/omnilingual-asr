@@ -32,7 +32,7 @@ Before running:
            --tokenizer_path tokenizer.model
 
     3. Install dependencies:
-       pip install transformers accelerate sentencepiece torch torchaudio
+       pip install transformers accelerate sentencepiece torch torchaudio soundfile
 """
 
 import argparse

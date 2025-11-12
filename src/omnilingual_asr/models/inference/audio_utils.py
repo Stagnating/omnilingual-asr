@@ -43,7 +43,30 @@ def load_audio(
 
     # Handle file paths
     if isinstance(audio_input, (str, Path)):
-        waveform, sample_rate = torchaudio.load(str(audio_input))
+        try:
+            waveform, sample_rate = torchaudio.load(str(audio_input))
+        except RuntimeError as e:
+            # Fallback to soundfile if torchaudio backend fails (common on Windows)
+            if "Couldn't find appropriate backend" in str(e):
+                try:
+                    import soundfile as sf
+                    data, sample_rate = sf.read(str(audio_input), dtype='float32')
+                    # Convert to tensor and ensure shape is [channels, time]
+                    waveform = torch.from_numpy(data).float()
+                    if waveform.dim() == 1:
+                        waveform = waveform.unsqueeze(0)  # [time] -> [1, time]
+                    else:
+                        # soundfile returns [time, channels], transpose to [channels, time]
+                        waveform = waveform.transpose(0, 1)
+                except ImportError:
+                    raise RuntimeError(
+                        f"Failed to load audio file {audio_input}. "
+                        "torchaudio backend is not available on your system. "
+                        "Please install soundfile: pip install soundfile"
+                    ) from e
+            else:
+                raise
+
         audio_data = {
             'waveform': waveform,
             'sample_rate': sample_rate,

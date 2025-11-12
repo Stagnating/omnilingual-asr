@@ -32,6 +32,7 @@ dependencies = [
     "pyarrow>=20.0.0",
     "torch",
     "torchaudio",
+    "soundfile>=0.12.1",  # Audio loading backend (required on Windows)
     "numba",
     "pandas",
     "numpy",
