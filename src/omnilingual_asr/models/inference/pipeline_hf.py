@@ -16,7 +16,7 @@ from numpy.typing import NDArray
 from omnilingual_asr.models.wav2vec2_llama.beamsearch_hf import (
     Wav2Vec2LlamaBeamSearchSeq2SeqGeneratorHF,
 )
-from omnilingual_asr.models.wav2vec2_llama.config import (
+from omnilingual_asr.models.wav2vec2_llama.config_hf import (
     ModelType,
     Wav2Vec2LlamaBeamSearchConfig,
 )

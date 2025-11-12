@@ -12,7 +12,7 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
-from omnilingual_asr.models.wav2vec2_llama.config import Wav2Vec2LlamaBeamSearchConfig
+from omnilingual_asr.models.wav2vec2_llama.config_hf import Wav2Vec2LlamaBeamSearchConfig
 from omnilingual_asr.models.wav2vec2_llama.model_hf import Wav2Vec2LlamaModelHF
 
 

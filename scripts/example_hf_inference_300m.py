@@ -46,7 +46,7 @@ from omnilingual_asr.models.wav2vec2_llama.model_hf import (
     Wav2Vec2LlamaModelHF,
     VocabularyInfo,
 )
-from omnilingual_asr.models.wav2vec2_llama.config import (
+from omnilingual_asr.models.wav2vec2_llama.config_hf import (
     ModelType,
     Wav2Vec2LlamaBeamSearchConfig,
 )

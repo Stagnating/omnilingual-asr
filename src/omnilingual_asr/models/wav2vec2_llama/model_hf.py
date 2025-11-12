@@ -14,7 +14,7 @@ import torch.nn.functional as F
 from torch import Tensor
 from transformers import Wav2Vec2Model, LlamaForCausalLM, LlamaConfig
 
-from omnilingual_asr.models.wav2vec2_llama.config import (
+from omnilingual_asr.models.wav2vec2_llama.config_hf import (
     ModelType,
     Wav2Vec2LlamaBeamSearchConfig,
 )
