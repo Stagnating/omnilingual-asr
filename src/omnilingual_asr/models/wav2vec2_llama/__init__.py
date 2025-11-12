@@ -4,39 +4,50 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree.
 
-
 from __future__ import annotations
 
-from omnilingual_asr.models.wav2vec2_llama.beamsearch import (
-    Wav2Vec2LlamaBeamSearchSeq2SeqGenerator as Wav2Vec2LlamaBeamSearchSeq2SeqGenerator,
-)
-from omnilingual_asr.models.wav2vec2_llama.config import (
-    WAV2VEC2_LLAMA_FAMILY as WAV2VEC2_LLAMA_FAMILY,
-)
-from omnilingual_asr.models.wav2vec2_llama.config import (
-    Wav2Vec2LlamaBeamSearchConfig as Wav2Vec2LlamaBeamSearchConfig,
-)
-from omnilingual_asr.models.wav2vec2_llama.config import (
-    Wav2Vec2LlamaConfig as Wav2Vec2LlamaConfig,
-)
-from omnilingual_asr.models.wav2vec2_llama.config import (
-    register_wav2vec2_llama_configs as register_wav2vec2_llama_configs,
-)
-from omnilingual_asr.models.wav2vec2_llama.factory import (
-    Wav2Vec2LlamaFactory as Wav2Vec2LlamaFactory,
-)
-from omnilingual_asr.models.wav2vec2_llama.factory import (
-    create_wav2vec2_llama_model as create_wav2vec2_llama_model,
-)
-from omnilingual_asr.models.wav2vec2_llama.hub import (
-    get_wav2vec2_llama_model_hub as get_wav2vec2_llama_model_hub,
-)
-from omnilingual_asr.models.wav2vec2_llama.interop import (
-    convert_wav2vec2_llama_state_dict as convert_wav2vec2_llama_state_dict,
-)
-from omnilingual_asr.models.wav2vec2_llama.model import (
-    Wav2Vec2LlamaModel as Wav2Vec2LlamaModel,
-)
+# Try to import fairseq2-dependent components
+# These are only available when fairseq2 is installed
+try:
+    from omnilingual_asr.models.wav2vec2_llama.beamsearch import (
+        Wav2Vec2LlamaBeamSearchSeq2SeqGenerator as Wav2Vec2LlamaBeamSearchSeq2SeqGenerator,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.config import (
+        WAV2VEC2_LLAMA_FAMILY as WAV2VEC2_LLAMA_FAMILY,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.config import (
+        Wav2Vec2LlamaBeamSearchConfig as Wav2Vec2LlamaBeamSearchConfig,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.config import (
+        Wav2Vec2LlamaConfig as Wav2Vec2LlamaConfig,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.config import (
+        register_wav2vec2_llama_configs as register_wav2vec2_llama_configs,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.factory import (
+        Wav2Vec2LlamaFactory as Wav2Vec2LlamaFactory,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.factory import (
+        create_wav2vec2_llama_model as create_wav2vec2_llama_model,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.hub import (
+        get_wav2vec2_llama_model_hub as get_wav2vec2_llama_model_hub,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.interop import (
+        convert_wav2vec2_llama_state_dict as convert_wav2vec2_llama_state_dict,
+    )
+    from omnilingual_asr.models.wav2vec2_llama.model import (
+        Wav2Vec2LlamaModel as Wav2Vec2LlamaModel,
+    )
+
+    _FAIRSEQ2_COMPONENTS_AVAILABLE = True
+except ImportError:
+    _FAIRSEQ2_COMPONENTS_AVAILABLE = False
+    # Fairseq2-dependent components not available
+    # HuggingFace-based components are still available:
+    #   from omnilingual_asr.models.wav2vec2_llama.model_hf import Wav2Vec2LlamaModelHF
+    #   from omnilingual_asr.models.wav2vec2_llama.beamsearch_hf import Wav2Vec2LlamaBeamSearchSeq2SeqGeneratorHF
+    #   from omnilingual_asr.models.wav2vec2_llama.config_hf import ModelType, Wav2Vec2LlamaBeamSearchConfig
 
 __all__ = [
     "Wav2Vec2LlamaBeamSearchSeq2SeqGenerator",
