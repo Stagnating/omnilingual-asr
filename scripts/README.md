@@ -4,6 +4,25 @@ This directory contains utility scripts and examples for omnilingual-asr.
 
 ## HuggingFace Migration Scripts
 
+### Tokenizer Download
+
+**`download_tokenizer.py`** - Download official OmniLingual ASR tokenizers
+
+```bash
+# Download default tokenizer (for 300m/1b/3b/7b_zs)
+python scripts/download_tokenizer.py --output tokenizer.model
+
+# Download v7 tokenizer (for 7b model)
+python scripts/download_tokenizer.py --output tokenizer_v7.model --version v7
+
+# Auto-select based on model config
+python scripts/download_tokenizer.py --output tokenizer.model --model-config 300m
+```
+
+**Tokenizer sources:**
+- Default: https://dl.fbaipublicfiles.com/mms/omniASR_tokenizer.model
+- V7: https://dl.fbaipublicfiles.com/mms/omniASR_tokenizer_v7.model
+
 ### Checkpoint Conversion
 
 **`convert_fairseq2_to_hf.py`** - Convert fairseq2 checkpoints to HuggingFace format
@@ -80,22 +99,37 @@ python scripts/quickstart_hf_300m.py audio.wav
 
 ## Workflow
 
-### 1. Convert Checkpoint
+### 1. Download Tokenizer
+
+```bash
+# Download the official tokenizer for your model
+python scripts/download_tokenizer.py \
+    --output tokenizer.model \
+    --model-config 300m
+```
+
+**Model-specific tokenizers:**
+- 300m, 1b, 3b, 7b_zs: Use `--model-config 300m` (default tokenizer)
+- 7b: Use `--model-config 7b` (v7 tokenizer)
+
+### 2. Convert Checkpoint
 
 ```bash
 # Convert your fairseq2 checkpoint
 python scripts/convert_fairseq2_to_hf.py \
     --input_checkpoint my_300m_model.pt \
     --output_dir converted_300m \
-    --model_config 300m
+    --model_config 300m \
+    --tokenizer_path tokenizer.model
 ```
 
-### 2. Run Inference
+### 3. Run Inference
 
 ```bash
 # Use the full example
 python scripts/example_hf_inference_300m.py \
     --checkpoint_dir converted_300m \
+    --tokenizer_path converted_300m/tokenizer.model \
     --audio_files test.wav \
     --lang en \
     --device cuda

@@ -14,18 +14,24 @@ without fairseq2 dependencies for the 300m model size.
 Usage:
     python scripts/example_hf_inference_300m.py \
         --checkpoint_dir path/to/converted/checkpoint \
-        --tokenizer_path path/to/tokenizer \
+        --tokenizer_path path/to/tokenizer.model \
         --audio_files audio1.wav audio2.wav \
         --lang en
 
 Before running:
-    1. Convert your fairseq2 checkpoint:
+    1. Download the tokenizer:
+       python scripts/download_tokenizer.py \
+           --output tokenizer.model \
+           --model-config 300m
+
+    2. Convert your fairseq2 checkpoint:
        python scripts/convert_fairseq2_to_hf.py \
            --input_checkpoint your_300m_checkpoint.pt \
            --output_dir converted_300m \
-           --model_config 300m
+           --model_config 300m \
+           --tokenizer_path tokenizer.model
 
-    2. Install dependencies:
+    3. Install dependencies:
        pip install transformers accelerate sentencepiece torch torchaudio
 """
 
